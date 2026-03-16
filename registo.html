@@ -18,38 +18,107 @@
         </nav>
     </header>
 
-    <main class="container mx-auto p-6 mt-8 max-w-3xl">
+    <main class="container mx-auto p-6 mt-8 max-w-4xl">
         <section class="bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-700">
-            <h1 id="titulo-formulario" class="text-3xl font-bold text-white mb-6">Registar Nova Descoberta</h1>
+            <h1 id="titulo-formulario" class="text-3xl font-bold text-white mb-8 border-b border-slate-700 pb-4">Registar Nova Descoberta</h1>
             
             <form id="formulario-planeta" class="space-y-6">
                 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="nome" class="block text-sm font-medium text-slate-300 mb-1">Nome do Planeta *</label>
+                        <input type="text" id="nome" name="nome" required class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="vendedor" class="block text-sm font-medium text-slate-300 mb-1">Vendedor</label>
+                        <input type="text" id="vendedor" name="vendedor" required class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="preco" class="block text-sm font-medium text-slate-300 mb-1">Preço (BTC) *</label>
+                        <input type="number" id="preco" name="preco" required min="0" step="0.01" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="galaxia" class="block text-sm font-medium text-slate-300 mb-1">Galáxia</label>
+                        <input type="text" id="galaxia" name="galaxia" required class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="sistema_estrelar" class="block text-sm font-medium text-slate-300 mb-1">Sistema Estrelar</label>
+                        <input type="text" id="sistema_estrelar" name="sistema_estrelar" required class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                </div>
+
                 <div>
-                    <label for="nome" class="block text-sm font-medium text-slate-300 mb-1">Nome do Planeta *</label>
-                    <input type="text" id="nome" name="nome" required 
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <label for="descricao" class="block text-sm font-medium text-slate-300 mb-1">Descrição</label>
+                    <textarea id="descricao" name="descricao" rows="3" required class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div>
+                        <label for="parcela" class="block text-sm font-medium text-slate-300 mb-1">Parcela de Venda</label>
+                        <select id="parcela" name="parcela" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                            <option value="todo">Planeta Inteiro</option>
+                            <option value="hemisferio">Hemisfério</option>
+                            <option value="zona">Zona Específica</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="area_total" class="block text-sm font-medium text-slate-300 mb-1">Área Total (km²)</label>
+                        <input type="number" id="area_total" name="area_total" required min="0" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="area_util" class="block text-sm font-medium text-slate-300 mb-1">Área Útil (km²)</label>
+                        <input type="number" id="area_util" name="area_util" required min="0" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+                    <div>
+                        <label for="fauna" class="block text-sm font-medium text-slate-300 mb-1">Fauna</label>
+                        <select id="fauna" name="fauna" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                            <option value="none">Nenhuma</option>
+                            <option value="terrestre">Terrestre</option>
+                            <option value="aviario">Aviário</option>
+                            <option value="aquatico">Aquático</option>
+                            <option value="marisco">Marisco</option>
+                            <option value="insetos">Insetos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="flora" class="block text-sm font-medium text-slate-300 mb-1">Flora</label>
+                        <select id="flora" name="flora" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                            <option value="none">Nenhuma</option>
+                            <option value="madeireira">Madeireira</option>
+                            <option value="ornamental">Ornamental</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Geologia (Múltiplos)</label>
+                        <div class="space-y-2">
+                            <label class="inline-flex items-center mr-4"><input type="checkbox" name="geologia" value="minerio" class="mr-2"> Minério</label>
+                            <label class="inline-flex items-center mr-4"><input type="checkbox" name="geologia" value="gas" class="mr-2"> Gás</label>
+                            <label class="inline-flex items-center"><input type="checkbox" name="geologia" value="liquido" class="mr-2"> Líquido</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="preco" class="block text-sm font-medium text-slate-300 mb-1">Preço (BTC) *</label>
-                        <input type="number" id="preco" name="preco" required min="0" step="0.01"
-                               class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                        <label for="fotoUrl" class="block text-sm font-medium text-slate-300 mb-1">URL da Foto Principal</label>
+                        <input type="url" id="fotoUrl" name="fotoUrl" placeholder="https://..." class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
                     </div>
                     <div>
-                        <label for="galaxia" class="block text-sm font-medium text-slate-300 mb-1">Galáxia</label>
-                        <input type="text" id="galaxia" name="galaxia" required
-                               class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                        <label for="vendido" class="block text-sm font-medium text-slate-300 mb-1">Estado</label>
+                        <select id="vendido" name="vendido" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                            <option value="false">Disponível</option>
+                            <option value="true">Vendido</option>
+                        </select>
                     </div>
                 </div>
 
-                <div>
-                    <label for="fotoUrl" class="block text-sm font-medium text-slate-300 mb-1">URL da Foto Principal</label>
-                    <input type="url" id="fotoUrl" name="fotoUrl" placeholder="https://..."
-                           class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
-                </div>
-
-                <div class="flex justify-end space-x-4 pt-4 border-t border-slate-700">
+                <div class="flex justify-end space-x-4 pt-6 border-t border-slate-700">
                     <a href="comando.html" class="px-6 py-2 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors">Cancelar</a>
                     <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors">
                         Guardar Registo
