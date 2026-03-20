@@ -12,6 +12,7 @@ async function obterPlanetas() {
             nome: planeta.nome,
             descricao: planeta.descricao,
             fotos: planeta.fotos, 
+            fotos2: planeta.fotos2,
             localizacao: { galaxia: planeta.galaxia, sistemaEstrelar: planeta.sistema_estrelar },
             parcela: planeta.parcela_venda,
             dimensoes: { areaTotal: Number(planeta.area_total), areaUtil: Number(planeta.area_util) },
@@ -74,6 +75,27 @@ function alternarFavorito(id) {
     carregarMontra(filtroAtual);
 }
 
+// Função para navegar na galeria de imagens
+function navegarGaleria(planetaId, direcao) {
+    const galeriaElement = document.getElementById(`galeria-${planetaId}`);
+    const fotoAtualElement = document.getElementById(`foto-atual-${planetaId}`);
+    const fotoTotalElement = document.getElementById(`foto-total-${planetaId}`);
+    
+    if (!galeriaElement || !fotoAtualElement || !fotoTotalElement) return;
+    
+    const totalFotos = parseInt(fotoTotalElement.textContent);
+    let indiceAtual = parseInt(fotoAtualElement.textContent) - 1;
+    
+    indiceAtual += direcao;
+    if (indiceAtual < 0) indiceAtual = totalFotos - 1;
+    if (indiceAtual >= totalFotos) indiceAtual = 0;
+    
+    const deslocamento = indiceAtual * 100;
+    galeriaElement.style.transform = `translateX(-${deslocamento}%)`;
+    
+    fotoAtualElement.textContent = indiceAtual + 1;
+}
+
 
 // MONTRA GALÁCTICA
 async function carregarMontra(filtroSelecionado = 'todos') {
@@ -107,6 +129,10 @@ async function carregarMontra(filtroSelecionado = 'todos') {
         const corEstrela = eFavorito ? 'text-yellow-400' : 'text-slate-400 hover:text-yellow-400';
         const iconeEstrela = eFavorito ? '★' : '☆';
 
+        const fotosParaMostrar = (planeta.fotos2 && planeta.fotos2.length > 0) ? planeta.fotos2 : planeta.fotos;
+        const temFotos = fotosParaMostrar && fotosParaMostrar.length > 0;
+        const mostraNavegacao = temFotos && fotosParaMostrar.length > 1;
+
         const cartaoHTML = `
             <article class="bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700 hover:border-blue-500 transition-all duration-300 transform hover:-translate-y-1 relative">
                 <button onclick="alternarFavorito('${planeta.id}')" 
@@ -115,10 +141,35 @@ async function carregarMontra(filtroSelecionado = 'todos') {
                     ${iconeEstrela}
                 </button>
 
-                <img src="${planeta.fotos[0]}" 
-                     alt="Vista orbital de ${planeta.nome}" 
-                     class="w-full h-48 object-cover"
-                     onerror="this.onerror=null; this.src='${fallbackImagem}';">
+                <div class="relative bg-slate-900 h-48 overflow-hidden group">
+                    <div class="galeria-fotos flex transition-transform duration-300 h-full" id="galeria-${planeta.id}">
+                        ${temFotos 
+                            ? fotosParaMostrar.map((foto, idx) => `
+                                <img src="${foto}" 
+                                     alt="Vista orbital de ${planeta.nome} (${idx + 1}/${fotosParaMostrar.length})" 
+                                     class="w-full h-48 object-cover flex-shrink-0"
+                                     onerror="this.onerror=null; this.src='${fallbackImagem}';">
+                            `).join('')
+                            : `<img src="${fallbackImagem}" 
+                                  alt="Imagem padrão" 
+                                  class="w-full h-48 object-cover">`
+                        }
+                    </div>
+                    
+                    ${mostraNavegacao ? `
+                        <button class="navegacao-foto anterior absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20" 
+                                onclick="navegarGaleria('${planeta.id}', -1)">
+                            ❮
+                        </button>
+                        <button class="navegacao-foto proximo absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/75 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20" 
+                                onclick="navegarGaleria('${planeta.id}', 1)">
+                            ❯
+                        </button>
+                        <div class="absolute bottom-2 right-3 bg-black/75 text-white text-xs px-2 py-1 rounded">
+                            <span id="foto-atual-${planeta.id}">1</span>/<span id="foto-total-${planeta.id}">${fotosParaMostrar.length}</span>
+                        </div>
+                    ` : ''}
+                </div>
                 
                 <div class="p-5">
                     <h2 class="text-2xl font-bold text-white mb-2">${planeta.nome}</h2>
@@ -206,13 +257,61 @@ async function configurarFormulario() {
                     cb.checked = geoArray.includes(cb.value);
                 });
 
-                if (planetaExistente.fotos && planetaExistente.fotos.length > 0) {
-                    document.getElementById('fotoUrl').value = planetaExistente.fotos[0];
+                // Preencher com as fotos existentes
+                if (planetaExistente.fotos2 && planetaExistente.fotos2.length > 0) {
+                    const containerFotos = document.getElementById('container-fotos');
+                    containerFotos.innerHTML = '';
+                    
+                    planetaExistente.fotos2.forEach((foto, idx) => {
+                        if (idx === 0) {
+                            containerFotos.innerHTML += `
+                                <input type="url" class="foto-url w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${idx}" value="${foto}">
+                            `;
+                        } else {
+                            const novoInput = document.createElement('div');
+                            novoInput.className = 'flex gap-2 items-center';
+                            novoInput.innerHTML = `
+                                <input type="url" class="foto-url flex-1 bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${idx}" value="${foto}">
+                                <button type="button" class="remover-foto-btn bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded transition-colors">Remover</button>
+                            `;
+                            containerFotos.appendChild(novoInput);
+                            novoInput.querySelector('.remover-foto-btn').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                novoInput.remove();
+                            });
+                        }
+                    });
+                    contadorFotos = planetaExistente.fotos2.length;
                 }
             }
         } catch (erro) {
             console.error("Erro ao preencher o formulário:", erro);
         }
+    }
+
+    // Inicializar botão de adicionar fotos (funciona em novo e edição)
+    const btnAdicionarFoto = document.getElementById('adicionar-foto-btn');
+    const containerFotos = document.getElementById('container-fotos');
+    let contadorFotos = containerFotos.querySelectorAll('.foto-url').length;
+
+    if (btnAdicionarFoto) {
+        btnAdicionarFoto.addEventListener('click', function(e) {
+            e.preventDefault();
+            const novoInput = document.createElement('div');
+            novoInput.className = 'flex gap-2 items-center';
+            novoInput.innerHTML = `
+                <input type="url" class="foto-url flex-1 bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${contadorFotos}">
+                <button type="button" class="remover-foto-btn bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded transition-colors">Remover</button>
+            `;
+            containerFotos.appendChild(novoInput);
+            contadorFotos++;
+
+            // Adicionar event listener para o botão remover
+            novoInput.querySelector('.remover-foto-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                novoInput.remove();
+            });
+        });
     }
 
     // Criação e Edição
@@ -222,8 +321,37 @@ async function configurarFormulario() {
         const checkboxesGeologia = document.querySelectorAll('input[name="geologia"]:checked');
         const arrayGeologia = Array.from(checkboxesGeologia).map(cb => cb.value);
 
-        const valorFoto = document.getElementById('fotoUrl').value;
-        const fallbackFoto = "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop";
+        // Recolher todas as URLs de fotos (fotos2 - URLs externas)
+        const inputsFotos = document.querySelectorAll('.foto-url');
+        const arrayFotos2 = [];
+        inputsFotos.forEach(input => {
+            if (input.value.trim()) {
+                arrayFotos2.push(input.value.trim());
+            }
+        });
+
+        // Preparar fotos2 - sempre vêm do formulário ou do original
+        let fotos2Finais;
+        if (arrayFotos2.length > 0) {
+            // Utilizador adicionou fotos novas
+            fotos2Finais = arrayFotos2;
+        } else if (planetaExistente?.fotos2) {
+            // Mantém as fotos2 originais
+            fotos2Finais = planetaExistente.fotos2;
+        } else {
+            // Nenhuma foto adicional
+            fotos2Finais = null;
+        }
+        
+        // Preparar fotos - sempre caminhos locais (nunca URLs do formulário)
+        let fotosFinais;
+        if (planetaExistente?.fotos && planetaExistente.fotos.length > 0) {
+            // Mantém as fotos locais originais
+            fotosFinais = planetaExistente.fotos;
+        } else {
+            // Usa um placeholder se nenhuma existe
+            fotosFinais = ["imagens/anuncio/placeholder.png"];
+        }
 
         const dadosFinais = {
             nome: document.getElementById('nome').value,
@@ -233,16 +361,19 @@ async function configurarFormulario() {
             sistema_estrelar: document.getElementById('sistema_estrelar').value,
             descricao: document.getElementById('descricao').value,
             parcela_venda: document.getElementById('parcela').value,
-            area_total: document.getElementById('area_total').value.toString(),
-            area_util: document.getElementById('area_util').value.toString(),
+            area_total: document.getElementById('area_total').value,
+            area_util: document.getElementById('area_util').value,
             vendido: document.getElementById('vendido').value === "true",
             recursos: { 
-                fauna: document.getElementById('fauna').value, 
-                flora: document.getElementById('flora').value, 
+                fauna: document.getElementById('fauna').value !== "none" ? document.getElementById('fauna').value : "none",
+                flora: document.getElementById('flora').value !== "none" ? document.getElementById('flora').value : "none",
                 geologia: arrayGeologia 
             },
-            fotos: valorFoto ? [valorFoto] : (planetaExistente ? planetaExistente.fotos : [fallbackFoto])
+            fotos: fotosFinais,
+            fotos2: fotos2Finais
         };
+
+        console.log('Dados a enviar para a API:', JSON.stringify(dadosFinais, null, 2));
 
         const urlFetch = idEdicao ? `${API_URL}/${idEdicao}` : API_URL;
         const metodoFetch = idEdicao ? 'PUT' : 'POST'; 
@@ -261,10 +392,12 @@ async function configurarFormulario() {
                 window.location.href = "comando.html";
             } else {
                 const msgErro = await resposta.text();
+                console.error('Erro completo da API:', msgErro);
                 alert(`Erro na API (Status ${resposta.status}): ${msgErro}`);
             }
         } catch (erro) {
             console.error("Erro na comunicação com a API:", erro);
+            alert("Erro de ligação com o servidor. Verifique a consola (F12) para mais detalhes.");
         }
     });
 }
@@ -318,14 +451,21 @@ async function carregarDetalhes() {
     const galeria = document.getElementById('galeria-fotos');
     const fallbackImagem = "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop";
     
-    planeta.fotos.forEach((fotoUrl, index) => {
-        galeria.innerHTML += `
-            <img src="${fotoUrl}" 
-                 alt="Foto ${index + 1} de ${planeta.nome}" 
-                 class="w-full h-64 object-cover rounded-lg border border-slate-700 shadow-md hover:scale-105 transition-transform duration-300"
-                 onerror="this.onerror=null; this.src='${fallbackImagem}';">
-        `;
-    });
+    // Usar fotos2 (URLs externas) se existirem, senão usar fotos locais
+    const fotosParaMostrar = (planeta.fotos2 && planeta.fotos2.length > 0) ? planeta.fotos2 : planeta.fotos;
+    
+    if (fotosParaMostrar && fotosParaMostrar.length > 0) {
+        fotosParaMostrar.forEach((fotoUrl, index) => {
+            galeria.innerHTML += `
+                <img src="${fotoUrl}" 
+                     alt="Foto ${index + 1} de ${planeta.nome}" 
+                     class="w-full h-64 object-cover rounded-lg border border-slate-700 shadow-md hover:scale-105 transition-transform duration-300"
+                     onerror="this.onerror=null; this.src='${fallbackImagem}';">
+            `;
+        });
+    } else {
+        galeria.innerHTML = `<img src="${fallbackImagem}" alt="Imagem padrão" class="w-full h-64 object-cover rounded-lg border border-slate-700 shadow-md">`;
+    }
 
     document.getElementById('mensagem-carregamento').classList.add('hidden');
     document.getElementById('conteudo-detalhes').classList.remove('hidden');

@@ -104,18 +104,24 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="fotoUrl" class="block text-sm font-medium text-slate-300 mb-1">URL da Foto Principal</label>
-                        <input type="url" id="fotoUrl" name="fotoUrl" placeholder="https://..." class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-slate-300">URLs das Fotos</label>
+                        <button type="button" id="adicionar-foto-btn" class="text-sm bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition-colors">
+                            + Adicionar Foto
+                        </button>
                     </div>
-                    <div>
-                        <label for="vendido" class="block text-sm font-medium text-slate-300 mb-1">Estado</label>
-                        <select id="vendido" name="vendido" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
-                            <option value="false">Disponível</option>
-                            <option value="true">Vendido</option>
-                        </select>
+                    <div id="container-fotos" class="space-y-3">
+                        <input type="url" class="foto-url w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="0">
                     </div>
+                </div>
+
+                <div>
+                    <label for="vendido" class="block text-sm font-medium text-slate-300 mb-1">Estado</label>
+                    <select id="vendido" name="vendido" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500">
+                        <option value="false">Disponível</option>
+                        <option value="true">Vendido</option>
+                    </select>
                 </div>
 
                 <div class="flex justify-end space-x-4 pt-6 border-t border-slate-700">
