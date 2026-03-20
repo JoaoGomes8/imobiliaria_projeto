@@ -263,23 +263,17 @@ async function configurarFormulario() {
                     containerFotos.innerHTML = '';
                     
                     planetaExistente.fotos2.forEach((foto, idx) => {
-                        if (idx === 0) {
-                            containerFotos.innerHTML += `
-                                <input type="url" class="foto-url w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${idx}" value="${foto}">
-                            `;
-                        } else {
-                            const novoInput = document.createElement('div');
-                            novoInput.className = 'flex gap-2 items-center';
-                            novoInput.innerHTML = `
-                                <input type="url" class="foto-url flex-1 bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${idx}" value="${foto}">
-                                <button type="button" class="remover-foto-btn bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded transition-colors">Remover</button>
-                            `;
-                            containerFotos.appendChild(novoInput);
-                            novoInput.querySelector('.remover-foto-btn').addEventListener('click', function(e) {
-                                e.preventDefault();
-                                novoInput.remove();
-                            });
-                        }
+                        const novoInput = document.createElement('div');
+                        novoInput.className = 'flex gap-2 items-center';
+                        novoInput.innerHTML = `
+                            <input type="url" class="foto-url flex-1 bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-blue-500" placeholder="https://..." data-foto-index="${idx}" value="${foto}">
+                            <button type="button" class="remover-foto-btn bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded transition-colors">Remover</button>
+                        `;
+                        containerFotos.appendChild(novoInput);
+                        novoInput.querySelector('.remover-foto-btn').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            novoInput.remove();
+                        });
                     });
                     contadorFotos = planetaExistente.fotos2.length;
                 }
@@ -294,6 +288,18 @@ async function configurarFormulario() {
     const containerFotos = document.getElementById('container-fotos');
     let contadorFotos = containerFotos.querySelectorAll('.foto-url').length;
 
+    function configurarBotaoRemover(botao, inputDiv) {
+        botao.addEventListener('click', function(e) {
+            e.preventDefault();
+            inputDiv.remove();
+        });
+    }
+
+    const primeiroRemover = containerFotos.querySelector('.remover-foto-btn');
+    if (primeiroRemover) {
+        configurarBotaoRemover(primeiroRemover, containerFotos.querySelector('div:first-child'));
+    }
+
     if (btnAdicionarFoto) {
         btnAdicionarFoto.addEventListener('click', function(e) {
             e.preventDefault();
@@ -307,10 +313,7 @@ async function configurarFormulario() {
             contadorFotos++;
 
             // Adicionar event listener para o botão remover
-            novoInput.querySelector('.remover-foto-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                novoInput.remove();
-            });
+            configurarBotaoRemover(novoInput.querySelector('.remover-foto-btn'), novoInput);
         });
     }
 
@@ -335,8 +338,11 @@ async function configurarFormulario() {
         if (arrayFotos2.length > 0) {
             // Utilizador adicionou fotos novas
             fotos2Finais = arrayFotos2;
-        } else if (planetaExistente?.fotos2) {
-            // Mantém as fotos2 originais
+        } else if (idEdicao) {
+            // Em edição, se deixou vazio significa que quer remover as fotos
+            fotos2Finais = [];
+        } else if (!idEdicao && planetaExistente?.fotos2) {
+            // Novo registo - mantém as fotos2 originais se existem
             fotos2Finais = planetaExistente.fotos2;
         } else {
             // Nenhuma foto adicional
